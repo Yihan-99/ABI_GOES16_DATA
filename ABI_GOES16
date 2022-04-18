@@ -1,0 +1,56 @@
+# This is used to process ABI l1 data
+**python**
+
+
+## Prepare the package we need
+import h5py as h5
+import netCDF4 as nc
+import numpy as np
+
+
+## Read geo-information(resolution is 1 km)
+geo_file = './goesr_16_static_1km.h5'   # goes static data 
+f_geo = h5.File(geo_file, 'r')
+    
+lat = f_geo['Latitude'][:]
+lon = f_geo['Longitude'][:]
+
+f_geo.close()     # Do not forget to close the file
+
+
+ ## Read ABI L1 data
+dataSetName = './OR_ABI-L1b-RadF-M6C01_G16_s20202130000188_e20202130009496_c20202130009554.nc'
+
+channel = 1    # select the channel you want to read
+dataSet = nc.Dataset(dataSetName, 'r')    
+
+Rad = dataSet['Rad'][:]
+fill_value = dataSet.variables['Rad']._FillValue       # read invalid data    
+Rad[Rad == fill_value] = np.nan     # mask the invalid value
+    
+    
+### normalize resolution into 1km
+#resolution = dataSet.__dict__["spatial_resolution"]    
+    
+#if not("1km" in resolution):
+#    Rad = changeResolution(file_path + dataSetName, "Rad") 
+#else:
+#    Rad = dataSet['Rad'][:]
+
+
+data = np.ma.zeros(np.shape(Rad))    # dataset used to save L1 data
+
+## read the visible data of channel 1-6
+if(channel<7):             
+    data = Rad_part * dataSet['kappa0'][:]
+        
+## read the infrared wavelength of channel 7-16    
+else:
+    fk1 = dataSet['planck_fk1'][:]
+    fk2 = dataSet['planck_fk2'][:]
+    bc1 = dataSet['planck_bc1'][:]
+    bc2 = dataSet['planck_bc2'][:]
+
+    data = (fk2/(np.log((fk1/Rad_part) + 1)) - bc1)/bc2   
+    
+dataSet.close()

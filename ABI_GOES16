@@ -53,4 +53,4 @@ else:
 
     data = (fk2/(np.log((fk1/Rad_part) + 1)) - bc1)/bc2   
     
-dataSet.close()
+dataSet.close()  # Do not forget to close the file

@@ -33,7 +33,7 @@ Rad[Rad == fill_value] = np.nan     # mask the invalid value
 #resolution = dataSet.__dict__["spatial_resolution"]    
     
 #if not("1km" in resolution):
-#    Rad = changeResolution(file_path + dataSetName, "Rad") 
+#    Rad = changeResolution(dataSetName, "Rad")    # changeResolution function is saved at the main list.
 #else:
 #    Rad = dataSet['Rad'][:]
 

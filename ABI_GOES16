@@ -21,7 +21,7 @@ f_geo.close()     # Do not forget to close the file
  ## Read ABI L1 data
 dataSetName = './OR_ABI-L1b-RadF-M6C01_G16_s20202130000188_e20202130009496_c20202130009554.nc'
 
-channel = 1    # select the channel you want to read
+channel = 1    # the channel you want to read, it should match the nc file!!!
 dataSet = nc.Dataset(dataSetName, 'r')    
 
 Rad = dataSet['Rad'][:]

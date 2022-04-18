@@ -1,0 +1,62 @@
+# prepare the package we need
+import netCDF4 as nc
+import numpy as np
+import matplotlib.pyplot as plt
+import sys
+
+def changeResolution(dataSetName, variable):
+    dataSet = nc.Dataset(dataSetName, 'r')
+
+    if 'x' not in dataSet.dimensions:
+        print("missing x dimension")
+        return
+        
+    if 'y' not in dataSet.dimensions:
+        print("missing y dimension")
+        return
+
+    xDim = dataSet.dimensions['x'].size
+    yDim = dataSet.dimensions['y'].size
+    
+    if 'spatial_resolution' not in dataSet.__dict__:
+        print("missing spatial resolution param")
+        return
+
+    resolution = dataSet.__dict__["spatial_resolution"]
+
+    if("0.5km" in resolution):
+        newX = int(xDim / 2)
+        newY = int(yDim / 2)
+        
+        grid = np.zeros([yDim, xDim])
+        grid[:,:] = dataSet['Rad'][:]
+    
+        newGrid = np.zeros([newY, newX])
+        
+        for y in range(0, newY):
+            for x in range(0, newX):
+                newGrid[y, x] = grid[y * 2, x * 2]
+                
+        return newGrid
+    elif("2km" in resolution):
+        newX = int(xDim * 2)
+        newY = int(yDim * 2)
+        
+        grid = np.zeros([yDim, xDim])
+        grid[:,:] = dataSet[variable][:]
+        
+        newGrid = np.zeros([newY, newX])
+
+        for y in range(0, yDim):
+            for x in range(0, xDim):
+                happyX = x * 2
+                happyY = y * 2
+                newGrid[happyY, happyX] = grid[y, x]
+                newGrid[happyY + 1, happyX] = grid[y, x]
+                newGrid[happyY, happyX + 1] = grid[y, x]
+                newGrid[happyY + 1, happyX + 1] = grid[y, x]
+                
+        return newGrid
+    else:
+        print("unsupported resolution, write some more code dude")
+        return

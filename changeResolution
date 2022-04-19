@@ -4,6 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
+
+# This function is used to change the resolution of ABI L1 data to 1km
+# dataSetName is the L1 .nc file's name, which include its path
+
+
 def changeResolution(dataSetName, variable):
     dataSet = nc.Dataset(dataSetName, 'r')
 
@@ -60,3 +65,12 @@ def changeResolution(dataSetName, variable):
     else:
         print("unsupported resolution, write some more code dude")
         return
+        
+  # Usage of changeResolution function
+  def main():    
+    dataSetName = "OR_ABI-L1b-RadF-M3C04_G16_s20190011830364_e20190011841130_c20190011841155.nc"
+    
+    newGrid = changeResolution(dataSetName, "Rad")
+    plt.imshow(newGrid)    
+    plt.show()
+

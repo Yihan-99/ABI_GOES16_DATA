@@ -11,6 +11,7 @@ import sys
 
 def changeResolution(dataSetName, variable):
     dataSet = nc.Dataset(dataSetName, 'r')
+    fill_value = dataSet.variables[variable]._FillValue       # read invalid data    
 
     if 'x' not in dataSet.dimensions:
         print("missing x dimension")
@@ -34,7 +35,8 @@ def changeResolution(dataSetName, variable):
         newY = int(yDim / 2)
         
         grid = np.zeros([yDim, xDim])
-        grid[:,:] = dataSet['Rad'][:]
+        grid[:,:] = dataSet[variable][:]
+        grid[grid == fill_value] = np.nan 
     
         newGrid = np.zeros([newY, newX])
         
@@ -43,12 +45,14 @@ def changeResolution(dataSetName, variable):
                 newGrid[y, x] = grid[y * 2, x * 2]
                 
         return newGrid
+        
     elif("2km" in resolution):
         newX = int(xDim * 2)
         newY = int(yDim * 2)
         
         grid = np.zeros([yDim, xDim])
         grid[:,:] = dataSet[variable][:]
+        grid[grid == fill_value] = np.nan 
         
         newGrid = np.zeros([newY, newX])
 
@@ -66,11 +70,14 @@ def changeResolution(dataSetName, variable):
         print("unsupported resolution, write some more code dude")
         return
         
-  # Usage of changeResolution function
-  def main():    
-    dataSetName = "OR_ABI-L1b-RadF-M3C04_G16_s20190011830364_e20190011841130_c20190011841155.nc"
+# Usage of changeResolution function
+def main():    
+  dataSetName = "OR_ABI-L1b-RadF-M3C04_G16_s20190011830364_e20190011841130_c20190011841155.nc"
     
-    newGrid = changeResolution(dataSetName, "Rad")
-    plt.imshow(newGrid)    
-    plt.show()
+  newGrid = changeResolution(dataSetName, "Rad")
+  plt.imshow(newGrid)    
+  plt.show()
+    
+if __name__ == "__main__":
+  main()
 
